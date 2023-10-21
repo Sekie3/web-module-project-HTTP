@@ -2,63 +2,49 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-
 import axios from 'axios';
 
-const EditMovieForm = (props) => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  
+const AddMovieForm = (props) => {
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-  const { setMovies } = props;
-  const [movie, setMovie] = useState({
-    title: "",
-    director: "",
-    genre: "",
+  const [newMovie, setNewMovie] = useState({
+    title: '',
+    director: '',
+    genre: '',
     metascore: 0,
-    description: ""
+    description: '',
   });
 
-  useEffect(() => {
-    axios.get(`http://localhost:9000/api/movies/${id}`)
-      .then(response => {
-        setMovie(response.data);
-        console.log(movie);
-      })
-      .catch(error => {
-        console.error('Error fetching the movie:', error);
-      });
-  }, [id]);
-  
-
   const handleChange = (e) => {
-    setMovie({
-      ...movie,
-      [e.target.name]: e.target.value
+    const { name, value } = e.target;
+    setNewMovie({
+      ...newMovie,
+      [name]: value,
     });
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.put(`http://localhost:9000/api/movies/${id}`, movie)
-      .then(res => {
+    axios.post('http://localhost:9000/api/movies', newMovie)
+      .then((res) => {
         props.setMovies(res.data);
-        navigate(`/movies/${id}`);
+        navigate('/movies');
       })
-      .catch(err => {
-        console.log(err);
+      .catch((err) => {
+        console.error('Error adding a movie:', err);
       });
-  }
-  
+  };
 
-  const { title, director, genre, metascore, description } = movie;
+  const { title, director, genre, metascore, description } = newMovie;
+
 
   return (
     <div className="col">
       <div className="modal-content">
         <form onSubmit={handleSubmit}>
           <div className="modal-header">
-            <h4 className="modal-title">Editing <strong>{movie.title}</strong></h4>
+            <h4 className="modal-title">Editing <strong>{newMovie.title}</strong></h4>
           </div>
           <div className="modal-body">
             <div className="form-group">
@@ -90,6 +76,6 @@ const EditMovieForm = (props) => {
       </div>
     </div>
   );
-}
+};
 
-export default EditMovieForm;
+export default AddMovieForm;
